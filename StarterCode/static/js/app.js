@@ -1,12 +1,15 @@
-// Call the data into the inspector console. 
-d3.json("samples.json").then(function (data) {
-    console.log(data);
+// Call the data into the inspector console and give
+// it names so it is easier to determine what we are looking at.
+let data = d3.json("samples.json").then(function (data) {
+  console.log("samples.json:", data);
+  console.log("Test Subject IDs:", data.names);
+  console.log("Test Subject Metadata:", data.metadata);
+  console.log("Test Subject Sample Data:", data.samples);
+
+  // Set up the DropDown:
+  let DropDown = d3.select(`#selDataset`);
+
+  data.names.forEach((name) => {
+    DropDown.append(`option`).text(name).property(`value`, name);
+  });
 });
-
-// Gather the top 10 OTUs:
-// Sort the data descending
-let sampleValues = data.sort((a, b) => b.sample_values - a.sample_values);
-let slicedSampleValues=sampleValues.slice(0,10);
-console.log(slicedSampleValues);
-
-// Create horizontal bar chart with dropdown menu for each OTU
