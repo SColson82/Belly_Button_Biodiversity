@@ -1,61 +1,96 @@
 // Initialize the page with a default plot (data for 940)
-function charts(name) {
+function charts(selectedPatientID) {
   d3.json("samples.json").then((data) => {
-    var subject = data.samples; //.map(function (row) {
-    // return row.sample_values.slice(0, 10);
-    // return row.otu_ids.slice(0, 10);
-    var resultsarray = subject.filter((sampleobject) => sampleobject.id == id);
-    var result = resultsarray[0];
-    var ids = result.otu_ids;
-    var labels = result.otu_labels;
-    var values = result.sample_values;
+    var plottingData = data.samples;
+    var subject = plottingData.filter(
+      (sampleobject) => sampleobject.id == selectedPatientID
+    )[0];
 
-    // console.log("This is what you are looking for:", samples);
-    // let demoPanel = d3.select("#sample-metadata");
-    // demoPanel.html("");
-    // let filteredData = samples.filter(
-    //   (sampleName) => sampleName.sample_values == sample_values
-    // )[0];
-    // Object.entries(filteredData).forEach(([key, value]) => {
-    //   demoPanel.append("h6").text(`${key.toUpperCase()}: ${value}`);
-    // });
+    console.log(subject);
+    var ids = subject.otu_ids;
+    var labels = subject.otu_labels;
+    var values = subject.sample_values;
 
-    let trace1 = [
-      {
-        x: ids
-          .slice(0, 10)
-          .map((otuID) => `OTU ${otuID}`)
-          .reverse(),
-        y: values.slice(0, 10).reverse(),
-        text: labels.slice(0, 10).reverse(),
-        type: "bar",
-        orientation: "h",
-      },
-    ];
-    // Data trace array
-    let traceData = [trace1];
-
-    // Apply the group barmode to the layout
-    let layout = {
-      title: "Belly Button BioDiversity",
+    // Horizontal Bar Char
+    var trace1 = {
+      x: values.slice(0, 10).reverse(),
+      y: ids
+        .slice(0, 10)
+        .map((otuID) => `OTU ${otuID}`)
+        .reverse(),
+      text: labels.slice(0, 10).reverse(),
+      type: "bar",
+      orientation: "h",
     };
 
-    // Render the plot to the div tag with id "plot"
-    Plotly.newPlot("bar", traceData, layout);
+    var data = [trace1];
+
+    var layout = {
+      title: "Top 10 Cultures Found",
+      margin: { t: 30, 1: 150 },
+    };
+
+    Plotly.newPlot("bar", data, layout);
+
+    // Bubble Chart
+    var trace1 = {
+      x: ids,
+      y: values,
+      text: labels,
+      mode: "markers",
+      marker: {
+        color: ids,
+        size: values,
+      },
+    };
+
+    var data = [trace1];
+
+    var layout = {
+      margin: { t: 0 },
+      xaxis: { title: "OTU ID" },
+      hovermode: "closest",
+    };
+
+    Plotly.newPlot("bubble", data, layout);
+
+    // Gauge
+    var data = [
+      {
+        domain: { x: [0, 1], y: [0, 1] },
+        value: values,
+        title: { text: "Speed" },
+        type: "indicator",
+        mode: "gauge+number",
+        delta: { reference: 400 },
+        gauge: { axis: { range: [null, 500] } },
+      },
+    ];
+
+    var layout = { width: 600, height: 400 };
+    Plotly.newPlot("gauge", data, layout);
   });
 }
 
-/** This part calls the data into the console and it appears to work. Stop messing with it.
- */
-// Call the data into the inspector console and give
-// it names so it is easier to determine what we are looking at.
+// Demographic Info
+function demo(selectedPatientID) {
+  d3.json("samples.json").then((data) => {
+    var MetaData = data.metadata;
+    var subject = MetaData.filter(
+      (sampleobject) => sampleobject.id == selectedPatientID
+    )[0];
+    var demographicInfoBox = d3.select("#sample-metadata");
+    demographicInfoBox.html("");
+    Object.entries(subject).forEach(([key, value]) => {
+      demographicInfoBox.append("h5").text(`${key}: ${value}`);
+    });
+  });
+}
+
+// Call the data into the inspector console
 function init() {
   d3.json("samples.json").then(function (data) {
     console.log("samples.json:", data);
-    console.log("Test Subject IDs:", data.names);
-    console.log("Test Subject Metadata:", data.metadata);
-    console.log("Test Subject Sample Data:", data.samples);
-
     // Set up the DropDown:
     let DropDown = d3.select(`#selDataset`);
 
@@ -65,11 +100,13 @@ function init() {
 
     const firstSample = data.names[0];
     charts(firstSample);
+    demo(firstSample);
   });
 }
 
-function change(newSample) {
+function optionChanged(newSample) {
   charts(newSample);
+  demo(newSample);
 }
 
 init();
