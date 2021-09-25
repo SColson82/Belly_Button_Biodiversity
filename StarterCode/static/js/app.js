@@ -27,7 +27,10 @@ function charts(selectedPatientID) {
 
     var layout = {
       title: "Top 10 Cultures Found",
-      margin: { t: 30, 1: 150 },
+      xaxis: { autorange: true },
+      yaxis: { autorange: true },
+      margin: { t: 70, l: 100 },
+      height: 380,
     };
 
     Plotly.newPlot("bar", data, layout);
@@ -41,6 +44,7 @@ function charts(selectedPatientID) {
       marker: {
         color: ids,
         size: values,
+        colorscale: "Electric",
       },
     };
 
@@ -50,25 +54,10 @@ function charts(selectedPatientID) {
       margin: { t: 0 },
       xaxis: { title: "OTU ID" },
       hovermode: "closest",
+      width: window.width,
     };
 
     Plotly.newPlot("bubble", data, layout);
-
-    // Gauge
-    var data = [
-      {
-        domain: { x: [0, 1], y: [0, 1] },
-        value: values,
-        title: { text: "Speed" },
-        type: "indicator",
-        mode: "gauge+number",
-        delta: { reference: 400 },
-        gauge: { axis: { range: [null, 500] } },
-      },
-    ];
-
-    var layout = { width: 600, height: 400 };
-    Plotly.newPlot("gauge", data, layout);
   });
 }
 
@@ -84,6 +73,27 @@ function demo(selectedPatientID) {
     Object.entries(subject).forEach(([key, value]) => {
       demographicInfoBox.append("h5").text(`${key}: ${value}`);
     });
+
+    // Gauge
+    var guageData = [
+      {
+        domain: { x: [0, 5], y: [0, 1] },
+        value: subject.wfreq,
+        text: subject.wfreq,
+        type: "indicator",
+        mode: "gauge+number",
+        delta: { reference: 10 },
+        gauge: { axis: { range: [null, 9] } },
+      },
+    ];
+
+    var layout = {
+      title: "<b>Belly Button Washing Frequency</b> <br>Scrubs Per Week</br>",
+      width: 350,
+      height: 350,
+      margin: { t: 50, r: 25, l: 25, b: 25 },
+    };
+    Plotly.newPlot("gauge", guageData, layout);
   });
 }
 
