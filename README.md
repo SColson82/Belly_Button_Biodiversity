@@ -39,3 +39,9 @@
 * Additionally, the data may be seen through the inspector console of the page (F12 or CTRL+SHFT+J). 
 
 ![image](https://user-images.githubusercontent.com/83737584/134755146-106a46db-b910-46fc-8a5f-27489fc627cf.png)
+
+<hr>
+Contact:
+
+* https://www.linkedin.com/in/sharon-colson-515222210/
+* sharon.colson@gmail.com
